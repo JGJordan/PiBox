@@ -18,7 +18,7 @@ Despite the physics complexities involved, this project is within scope and feas
 ## 🛠 Tools, Technology, and Equipment
 
 ### 🏗 Tools
-- **Azure Hosting** for cloud-based data processing and storage
+- **Azure Hosting** / **Blynk Hosting** for cloud-based data processing and storage
 - **Visual Studio Code** for development
 - **Python** for backend processing
 - **Basic Web Interface** for frontend visualization
@@ -37,7 +37,6 @@ Despite the physics complexities involved, this project is within scope and feas
 
 ## 📌 Future Considerations
 - Improving accuracy of motion detection for precise harsh braking alerts
-- Exploring additional safety features (e.g., fatigue detection, lane departure warning)
-- Potential integration with a mobile app for real-time monitoring
+- Potential integration with a mobile app (potentially Blynk) for real-time monitoring
 
 🚀 **Let's make driving safer and smarter!**
