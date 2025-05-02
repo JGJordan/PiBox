@@ -12,5 +12,6 @@ gyro = sense.get_orientation()
 acceleration = sense.get_accelerometer_raw()
 mag = sense.get_compass()
 
+sense.show_message("Welcome to PiBox!")
 sense.clear(BLUE)
 
