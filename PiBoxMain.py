@@ -1,17 +1,102 @@
 from sense_hat import SenseHat
 sense = SenseHat()
+import time 
 
 #Assign RGB
 GREEN = (0, 255, 0)
 RED = (255, 0 , 0)
 BLUE = (0, 0, 255)
+OFF = (0,0,0)
 
 temp = sense.get_temperature()
 humidity = sense.get_humidity()
-gyro = sense.get_orientation()
-acceleration = sense.get_accelerometer_raw()
 mag = sense.get_compass()
 
-sense.show_message("Welcome to PiBox!")
+#Define Threshold for detecting a 90-degree rotation
+ROTATION_THRESHOLD = 45
+
+#Set Initial Orientation
+initial_orientation = sense.get_gyroscope()
+
 sense.clear(BLUE)
 
+#Function 1 - Brake Detection
+
+brake_trigger = 1.5 #Set value for amount of movement required to trigger harsh break detection function
+
+def brake_check():
+    harshBrake = False
+    acceleration = sense.get_accelerometer_raw()
+    x = abs(acceleration['x'])
+    y = abs(acceleration['y'])
+    z = abs(acceleration['z'])
+
+    if x > brake_trigger or y > brake_trigger or z > brake_trigger:
+        harshBrake = True
+        print("Harsh Brake!")
+    return harshBrake
+
+
+#Function 2 - Flip Detection - The idea of this function is to take gyroscope parameters. If these parameters above
+#a certain threshold, the "detect_rotation" function triggers. This works individually but not on my main script?
+
+def detect_rotation():
+    orientation = sense.get_gyroscope()
+    pitch = orientation['pitch']
+    roll = orientation['roll']
+
+    delta_pitch = abs(pitch - initial_orientation['pitch'])
+    delta_roll = abs(roll - initial_orientation['roll'])
+
+    if (ROTATION_THRESHOLD <= delta_pitch <= (ROTATION_THRESHOLD + 10) or
+        ROTATION_THRESHOLD <= delta_roll <= (ROTATION_THRESHOLD + 10)):
+        return True
+    return False
+
+
+#Function(s) 3 - Weather Warning Trigger
+
+def weather_warning_cold():
+    temp = sense.get_temperature()
+    if (temp < 5):
+        print("Temp below 5 degrees!")
+        return True
+    return False
+
+def weather_warning_hot():
+    temp = sense.get_temperature()
+    if (temp > 40):
+        print("Temp has surpassed 30 degrees!")
+        return True
+    return False
+
+while True:
+    
+    if weather_warning_cold():
+        sense.show_message("Brr!", scroll_speed=0.05, text_colour=BLUE)
+        sense.clear(BLUE)
+        time.sleep(3)
+
+    if weather_warning_hot():
+        sense.show_message("It's Hot!", scroll_speed=0.05)
+        sense.clear(RED)
+        time.sleep(3)
+
+
+    if brake_check():
+        sense.clear(RED)
+        time.sleep(0.5)
+        sense.clear(OFF)
+        time.sleep(0.5)
+        sense.clear(RED)
+        time.sleep(0.5)
+        sense.clear(BLUE)
+
+
+    elif detect_rotation():
+        print("Car has flipped!")
+        sense.clear(RED)
+        time.sleep(1.5)
+        sense.clear(BLUE)
+    time.sleep(0.5)
+    
