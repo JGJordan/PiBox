@@ -4,8 +4,8 @@ sense = SenseHat()
 import time 
 import json
 import BlynkLib
-connection_string = "INSERT_AZURE_AUTH"
-BLYNK_TEMPLATE_ID = "TMPL4sVXjZnQO"
+connection_string = "INSERT_HOST_STRING"
+BLYNK_TEMPLATE_ID = "INSERT_TEMPLATE_ID"
 BLYNK_TEMPLATE_NAME = "PiBox"
 BLYNK_AUTH_TOKEN = "INSERT_BLYNK_AUTH"
 device_client = IoTHubDeviceClient.create_from_connection_string(connection_string)
@@ -25,14 +25,12 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 OFF = (0,0,0)
 
-temp = sense.get_temperature()
-humidity = sense.get_humidity()
-mag = sense.get_compass()
+harsh_brake_count = 0
 
 
 
 #Define Threshold for detecting a 90-degree rotation
-ROTATION_THRESHOLD = 45
+ROTATION_THRESHOLD = 90
 
 #Set Initial Orientation
 initial_orientation = sense.get_gyroscope()
@@ -44,15 +42,19 @@ sense.clear(BLUE)
 brake_trigger = 1.5 #Set value for amount of movement required to trigger harsh break detection function
 
 def brake_check():
+    global harsh_brake_count
     harshBrake = False
     acceleration = sense.get_accelerometer_raw()
     x = abs(acceleration['x'])
     y = abs(acceleration['y'])
     z = abs(acceleration['z'])
 
+
     if x > brake_trigger or y > brake_trigger or z > brake_trigger:
         harshBrake = True
         print("Harsh Brake!")
+        harsh_brake_count += 1
+        blynk.virtual_write(2, harsh_brake_count)
     return harshBrake
 
 
